@@ -25,6 +25,9 @@ def main():
     # set substrate spacing offset
     offset = 0
 
+    # set default encapsulation guide
+    encapsulation = False
+
     # prompt user to enter substrate size
     print("\nWelcome to the substrate label generator!\n")
     subw = input("What substrate size are you using? (a=28mm, b=30mm, c=112mm): ")
@@ -39,6 +42,17 @@ def main():
 
         # update substrate spacing offset
         offset = 1.5
+
+        # prompt user to choose to include encapsulation scratch guide
+        encapsulation = input("Do you want encapsulation scratching guides? [y/n]: ")
+        if encapsulation == "y":
+            encapsulation = True
+        elif encapsulation == "n":
+            encapsulation = False
+        else:
+            raise ValueError(
+                f'"{encapsulation}" not recognised. Please enter "y" or "n".'
+            )
     elif subw == "c":
         subw = 112
     else:
@@ -218,6 +232,34 @@ def main():
                 ),
                 dxfattribs={"layer": "lines"},
             )
+
+        # add guides for encapsulation
+        if (subw == 30) and (encapsulation is True):
+            encapsulation_x_offset = 2.5
+            encapsulation_y_offset = 5.75
+            encapsulation_points = [
+                (
+                    col_offset + devw * col + encapsulation_x_offset,
+                    row_offset + (rows - row) * devw + encapsulation_y_offset,
+                ),
+                (
+                    col_offset + devw * col + devw - encapsulation_x_offset,
+                    row_offset + (rows - row) * devw + encapsulation_y_offset,
+                ),
+                (
+                    col_offset + devw * col + devw - encapsulation_x_offset,
+                    row_offset + (rows - row) * devw + devw - encapsulation_y_offset,
+                ),
+                (
+                    col_offset + devw * col + encapsulation_x_offset,
+                    row_offset + (rows - row) * devw + devw - encapsulation_y_offset,
+                ),
+                (
+                    col_offset + devw * col + encapsulation_x_offset,
+                    row_offset + (rows - row) * devw + encapsulation_y_offset,
+                ),
+            ]
+            msp.add_lwpolyline(encapsulation_points, dxfattribs={"layer": "lines"})
 
         # add pixel 1 indicator
         if number:
