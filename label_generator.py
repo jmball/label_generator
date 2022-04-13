@@ -32,14 +32,13 @@ def main():
         subw = 28
     elif subw == "b":
         subw = 30
-        holder = input("Are you using the substrate holder? [y/n]: ")
-        if holder == "y":
-            # update empirical laser etcher x, y offsets
-            laser_offset_x = 2.26
-            laser_offset_y = 2.08
 
-            # update substrate spacing offset
-            offset = 1.5
+        # update empirical laser etcher x, y offsets
+        laser_offset_x = 2.26
+        laser_offset_y = 2.08
+
+        # update substrate spacing offset
+        offset = 1.5
     elif subw == "c":
         subw = 112
     else:
