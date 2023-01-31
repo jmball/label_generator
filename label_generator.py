@@ -33,12 +33,14 @@ def main():
     subw = input("What substrate size are you using? (a=28mm, b=30mm, c=112mm): ")
     if subw == "a":
         subw = 28
+        max_substrates = 64
     elif subw == "b":
         subw = 30
+        max_substrates = 108
 
         # update empirical laser etcher x, y offsets
-        laser_offset_x = 2.26
-        laser_offset_y = 2.08
+        laser_offset_x = 3.10
+        laser_offset_y = 1.92
 
         # update substrate spacing offset
         offset = 1.5
@@ -59,8 +61,15 @@ def main():
         raise ValueError(f'"{subw}" not recognised. Please enter "a", "b", or "c".')
 
     # prompt user to enter number of substrates
-    substrates = input("How many substrates are you labelling?: ")
+    substrates = input(
+        f"How many substrates are you labelling (max = {max_substrates})?: "
+    )
     substrates = int(substrates)
+    if substrates > max_substrates:
+        raise ValueError(
+            f"Number of substrates selected ({substrates}) is greater than maximum "
+            + f"allowed ({max_substrates})."
+        )
 
     # prompt user to choose to include scratch lines
     scratch = input("Do you want common electrode scratching guides? [y/n]: ")
@@ -141,7 +150,10 @@ def main():
         new_labels.append([num, label, user, timestamp])
 
         # calculate row and col num
-        if (subw == 30) or (subw == 28):
+        if subw == 30:
+            row = np.floor(i / 12)
+            col = i % 12
+        elif subw == 28:
             row = np.floor(i / 8)
             col = i % 8
         elif subw == 112:
