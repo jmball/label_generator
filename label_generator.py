@@ -19,46 +19,31 @@ def main():
     user = getpass.getuser()
 
     # set empirical laser etcher x, y offsets
-    laser_offset_x = 0.75
-    laser_offset_y = 0
+    laser_offset_x = 3.10
+    laser_offset_y = 1.92
 
     # set substrate spacing offset
     offset = 0
+
+    max_substrates = 1
 
     # set default encapsulation guide
     encapsulation = False
 
     # prompt user to enter substrate size
     print("\nWelcome to the substrate label generator!\n")
-    subw = input("What substrate size are you using? (a=28mm, b=30mm, c=112mm): ")
+    subw = input("What substrate size are you using? (a=30mm, b=150mm): ")
     if subw == "a":
-        subw = 28
-        max_substrates = 64
-    elif subw == "b":
         subw = 30
         max_substrates = 108
-
-        # update empirical laser etcher x, y offsets
-        laser_offset_x = 3.10
-        laser_offset_y = 1.92
 
         # update substrate spacing offset
         offset = 1.5
 
-        # prompt user to choose to include encapsulation scratch guide
-        encapsulation = input("Do you want encapsulation scratching guides? [y/n]: ")
-        if encapsulation == "y":
-            encapsulation = True
-        elif encapsulation == "n":
-            encapsulation = False
-        else:
-            raise ValueError(
-                f'"{encapsulation}" not recognised. Please enter "y" or "n".'
-            )
-    elif subw == "c":
-        subw = 112
+    elif subw == "b":
+        subw = 150
     else:
-        raise ValueError(f'"{subw}" not recognised. Please enter "a", "b", or "c".')
+        raise ValueError(f'"{subw}" not recognised. Please enter "a" or "b".')
 
     # prompt user to enter number of substrates
     substrates = input(
@@ -70,6 +55,15 @@ def main():
             f"Number of substrates selected ({substrates}) is greater than maximum "
             + f"allowed ({max_substrates})."
         )
+
+    # prompt user to choose to include encapsulation scratch guide
+    encapsulation = input("Do you want encapsulation scratching guides? [y/n]: ")
+    if encapsulation == "y":
+        encapsulation = True
+    elif encapsulation == "n":
+        encapsulation = False
+    else:
+        raise ValueError(f'"{encapsulation}" not recognised. Please enter "y" or "n".')
 
     # prompt user to choose to include scratch lines
     scratch = input("Do you want common electrode scratching guides? [y/n]: ")
@@ -90,7 +84,7 @@ def main():
         raise ValueError(f'"{scotch}" not recognised. Please enter "y" or "n".')
 
     # prompt user to choose to include scratch lines
-    number = input("Do you want device number marks (+ and o in corners)? [y/n]: ")
+    number = input("Do you want a device 1 mark (+ in corner)? [y/n]: ")
     if number == "y":
         number = True
     elif number == "n":
@@ -98,27 +92,20 @@ def main():
     else:
         raise ValueError(f'"{number}" not recognised. Please enter "y" or "n".')
 
-    # check if number of substrates is valid
-    if (subw == 30) or (subw == 28):
-        if substrates > 64:
-            raise ValueError("The maximum number of 28mm or 30mm substrates is 64")
+    # set more substrate parameters
+    if subw == 30:
         devices = substrates
         devw = subw
         rows = np.floor((devices - 1) / 8)
-    elif subw == 112:
-        if substrates != 1:
-            raise ValueError("The maximum number of 112mm substrates is 1")
-        devices = 16
-        devw = 28
-        rows = 3
+    elif subw == 150:
+        devices = 25
+        devw = 30
+        rows = 5 - 1
 
     print("Please wait a moment while your labels are generated...")
 
-    # determine scotchtape width
-    if subw == 30:
-        scotchw = 20.5
-    elif (subw == 28) or (subw == 112):
-        scotchw = 19
+    # set scotchtape width based on 30x30 repeat unit
+    scotchw = 20.5
 
     # set width of guide for common electrode scratching
     comw = 1.5
@@ -153,12 +140,9 @@ def main():
         if subw == 30:
             row = np.floor(i / 12)
             col = i % 12
-        elif subw == 28:
-            row = np.floor(i / 8)
-            col = i % 8
-        elif subw == 112:
-            row = np.floor(i / 4)
-            col = i % 4
+        elif subw == 150:
+            row = np.floor(i / 5)
+            col = i % 5
 
         col_offset = offset + 2 * offset * col
         row_offset = offset + 2 * offset * (rows - row)
@@ -246,7 +230,7 @@ def main():
             )
 
         # add guides for encapsulation
-        if (subw == 30) and (encapsulation is True):
+        if encapsulation is True:
             encapsulation_x_offset = 2.5
             encapsulation_y_offset = 5.75
             encapsulation_points = [
@@ -380,7 +364,6 @@ def main():
     # save newly created file path to a temp file that can be read from a batch file
     with open("temp.txt", "w", encoding="utf8") as file:
         file.write(f"{label_dir}/{dxfname}")
-
 
 if __name__ == "__main__":
     main()
