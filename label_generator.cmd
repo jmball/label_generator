@@ -53,9 +53,8 @@ if %localerr% neq 0 (
 	echo Env not found. Creating labels conda environment...
 	call conda create -y -n labels python=3.7
 	call conda activate labels
-	call conda config --add channels conda-forge
-	call conda config --set channel_priority strict
-	call conda install -y numpy ezdxf
+	call python -m pip install numpy=1.21
+	call python -m pip install ezdxf=0.17.2
 	call conda deactivate
 	call conda clean --yes --all
 )
@@ -63,7 +62,6 @@ del /f envs.txt
 
 :: activate label environment and make sure ezdxf is up to date
 call conda activate labels
-call conda update -y ezdxf
 
 :: run the label generator, outputting labels path to a temp file
 call python label_generator.py
