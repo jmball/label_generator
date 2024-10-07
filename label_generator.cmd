@@ -51,7 +51,7 @@ find "labels" envs.txt > nul
 set localerr=%errorlevel%
 if %localerr% neq 0 (
 	echo Env not found. Creating labels conda environment...
-	call conda create -y -n labels python=3.7
+	call conda create -y -n labels python=3.7 -c conda-forge --override-channels
 	call conda activate labels
 	call python -m pip install numpy=1.21
 	call python -m pip install ezdxf=0.17.2
